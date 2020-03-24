@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+set -e
+
+apt-get update
+
+
+if [[ ! -d $HOME/buildversion1 ]]; then
+    mkdir buildversion1
+    cd buildversion1
+    vared -p "What's your email address: " -c EMAIL_ADDRESS
+    ssh-keygen -t rsa -b 4096 -C "$EMAIL_ADDRESS" -f version1key
+    echo "Copy and paste this in private repo deploy tokens: "
+    cat version1key.pub
+    vared -p "Completed [Y/N] ?" -c STATUS
+else
+    STATUS="Y"
+fi
+
+
+if [[ $STATUS = 'Y' ]]; then
+    cd $HOME/buildversion1
+    eval "$(ssh-agent -s)"
+    ssh-add version1key
+fi
+
+
+# No point in creating a keyring
+#    gcloud kms keyrings create version1-keyring --location=global
+#    gcloud kms keys create github-key --location=global  --keyring=version1-keyring --purpose=encryption
+#    gcloud kms encrypt --plaintext-file=version1key --ciphertext-file=version1key.enc --location=global --keyring=version1-keyring --key=github-key
+#
+#    vared -p "Cloud build account id: " -c ACCOUNT_ID
+#    gcloud kms keys add-iam-policy-binding github-key --location=global --keyring=version1-keyring \
+#    --member=serviceAccount:${ACCOUNT_ID}@cloudbuild.gserviceaccount.com \
+#    --role=roles/cloudkms.cryptoKeyEncrypterDecrypter
+
+#    ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts

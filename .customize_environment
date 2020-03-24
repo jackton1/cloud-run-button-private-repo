@@ -2,17 +2,14 @@
 
 set -e
 
-apt-get update
-
-
 if [[ ! -d $HOME/buildversion1 ]]; then
     mkdir buildversion1
     cd buildversion1
-    vared -p "What's your email address: " -c EMAIL_ADDRESS
+    read -e -p "What's your email address: " -i "$EMAIL_ADDRESS" EMAIL_ADDRESS
     ssh-keygen -t rsa -b 4096 -C "$EMAIL_ADDRESS" -f version1key
     echo "Copy and paste this in private repo deploy tokens: "
     cat version1key.pub
-    vared -p "Completed [Y/N] ?" -c STATUS
+    read -e -p "Completed [Y/N] ?" -i "$STATUS" STATUS
 else
     STATUS="Y"
 fi
